@@ -1,24 +1,37 @@
-package beans;
+package fr.projet.jee.beans;
 
-import java.util.Date;
+import java.sql.Date;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 public class Person {
 	
-	private long idPerson;
+	private long personId;
 	private String firstName;
 	private String lastName;
 	private String email;
 	private String webSite;
 	private Date birthDate;
 	private String password;
-	private long idGroup;
+	private long groupId;
 
-	public long getIdPerson() {
-		return idPerson;
+	@PostConstruct
+	public void init() {
+		
+	}
+	
+	@PreDestroy
+	public void close() {
+		
+	}
+	
+	public long getPersonId() {
+		return personId;
 	}
 
-	public void setIdPerson(long idPerson) {
-		this.idPerson = idPerson;
+	public void setPersonId(long personId) {
+		this.personId = personId;
 	}
 
 	public String getFirstName() {
@@ -69,12 +82,22 @@ public class Person {
 		this.password = password;
 	}
 
-	public long getIdGroup() {
-		return idGroup;
+	public long getGroupId() {
+		return groupId;
 	}
 
-	public void setIdGroup(long idGroup) {
-		this.idGroup = idGroup;
+	public void setGroupId(long groupId) {
+		this.groupId = groupId;
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof Person) {
+			Person person = (Person) other;
+			return person.getPersonId() == this.getPersonId();
+		} else {
+			throw new IllegalArgumentException();
+		}
 	}
 	
 }
