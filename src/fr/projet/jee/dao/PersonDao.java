@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 import fr.projet.jee.beans.Group;
 import fr.projet.jee.beans.Person;
 import fr.projet.jee.dao.interfaces.IPersonDao;
+import fr.projet.jee.exceptions.GroupDoesNotExistException;
+import fr.projet.jee.exceptions.InvalidGroupException;
+import fr.projet.jee.exceptions.InvalidPersonException;
 import fr.projet.jee.exceptions.PersonDoesNotExistException;
 
 @Service
@@ -110,7 +113,7 @@ public class PersonDao implements IPersonDao {
 			}
 		} catch (SQLException se) {
 			se.printStackTrace();
-		} catch (Exception e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 
@@ -118,8 +121,42 @@ public class PersonDao implements IPersonDao {
 	}
 
 	@Override
-	public void savePerson(Person person) {
+	public Group findGroup(long id) throws GroupDoesNotExistException {
+		Group group = new Group();
 		try (Connection connection = createConnection()) {
+			Statement statement = connection.createStatement();
+			ResultSet resultSet;
+			resultSet = statement.executeQuery("select * from GROUPS where GroupId=" + id + ";");
+			if (resultSet.next()) {
+				group.setName(resultSet.getString("Name"));
+				group.setGroupId(resultSet.getInt("GroupId"));
+				// TODO : gestion des personnes qui font partie du groupe
+			} else {
+				throw new GroupDoesNotExistException("There is no group of id=" + id + " in base !");
+			}
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return group;
+	}
+
+	@Override
+	public void savePerson(Person person) throws InvalidPersonException {
+		try (Connection connection = createConnection()) {
+			
+			if (person.getPersonId() <= 0) {
+				throw new InvalidPersonException("Id of a person must be strictly positive.");
+			}
+			else if (personExists(person.getPersonId())) {
+				try {
+					deletePerson(person.getPersonId());
+				} catch (PersonDoesNotExistException e) {
+					e.printStackTrace();
+				}
+			}
+			
 			String sql;
 			sql = "INSERT INTO PERSONS(PersonId,FirstName,LastName,Email,WebSite,BirthDate,Password,GroupId)"
 					+ " VALUES(?,?,?,?,?,?,?,?)";
@@ -137,15 +174,22 @@ public class PersonDao implements IPersonDao {
 			preparedStatement.close();
 		} catch (SQLException se) {
 			se.printStackTrace();
-		} catch (Exception e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 
 	}
 
 	@Override
-	public void saveGroup(Group group) {
+	public void saveGroup(Group group) throws InvalidGroupException {
 		try (Connection connection = createConnection()) {
+			if (group.getGroupId() <= 0) {
+				throw new InvalidGroupException("Id of a group must be strictly positive.");
+			}
+			else if (groupExists(group.getGroupId())) {
+				deleteGroup(group.getGroupId());
+			}
+			
 			String sql;
 			sql = "INSERT INTO GROUPS(GroupId, Name) VALUES(?,?)";
 
@@ -157,10 +201,9 @@ public class PersonDao implements IPersonDao {
 			preparedStatement.close();
 		} catch (SQLException se) {
 			se.printStackTrace();
-		} catch (Exception e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	@Override
@@ -189,9 +232,9 @@ public class PersonDao implements IPersonDao {
 	}
 
 	/**
-	 * Vide la table GROUPS Cette opération est risquée car elle ne prend pas en
-	 * compte les groupes éventuellement référencés par des personnes via la clé
-	 * étrangère
+	 * Clears table GROUPS : this operation is to be used carefully because it
+	 * doesn't check if there are consistency error with foreign key referencing
+	 * groups
 	 */
 	private void clearGroups() {
 		try (Connection connection = createConnection()) {
@@ -213,26 +256,6 @@ public class PersonDao implements IPersonDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public Group findGroup(long id) {
-		Group group = new Group();
-		try (Connection connection = createConnection()) {
-			Statement statement = connection.createStatement();
-			ResultSet resultSet;
-			resultSet = statement.executeQuery("select * from GROUPS where GroupId=" + id + ";");
-			while (resultSet.next()) {
-				group.setName(resultSet.getString("Name"));
-				group.setGroupId(resultSet.getInt("GroupId"));
-				// TODO : gestion des personnes qui font partie du groupe
-			}
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return group;
 	}
 
 	@Override
@@ -274,18 +297,42 @@ public class PersonDao implements IPersonDao {
 	}
 
 	@Override
-	public void deletePerson(long id) {
+	public void deletePerson(long id) throws PersonDoesNotExistException {
 		try (Connection connection = createConnection()) {
 			Statement statement = connection.createStatement();
 			if (personExists(id)) {
-				statement.executeUpdate("delete from PERSONS where PersonId=" + id +";");
+				statement.executeUpdate("delete from PERSONS where PersonId=" + id + ";");
+			} else {
+				throw new PersonDoesNotExistException("Trying to delete a person that is not known in base.");
 			}
 
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Deletes a group WITHOUT checking if a foreign key  is referencing it => may cause inconsistencies 
+	 * @param id the group to be deleted
+	 */
+	private void deleteGroup(long id) {
+		try (Connection connection = createConnection()) {
+			String sql;
+			Statement statement = connection.createStatement();
+			if (groupExists(id)) {
+				sql = "SET FOREIGN_KEY_CHECKS = 0; ";
+				statement.executeUpdate(sql);
+				sql = "delete from GROUPS where GroupId=" + id + ";";
+				statement.executeUpdate(sql);
+				sql = "SET FOREIGN_KEY_CHECKS = 1;";
+				statement.executeUpdate(sql);
+			}
 		} catch (SQLException se) {
 			se.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
 }
