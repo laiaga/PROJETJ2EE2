@@ -335,4 +335,27 @@ public class PersonDao implements IPersonDao {
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public void modifyPerson(Person p) throws PersonDoesNotExistException{
+		try (Connection conn = createConnection()) {
+			
+			SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy"); 
+
+			//Vérifier si la personne existe avant de l'update
+			
+			String sql;
+			sql = "UPDATE PERSON SET firstName ='"+p.getFirstName()+"' and lastName ='"+p.getFirstName()+"' and mail ='"+p.getMail()+"' and webSite ='"+p.getWebSite()+"' and  birthDate=TO_DATE('"+dt.format(p.getBirthDate())+"', 'DD/MM/YYYY') and password ='"+p.getPassword()+"' where idPerson="+p.getIdPerson();
+
+			PreparedStatement ps1 = conn.prepareStatement(sql);
+
+			ps1.executeUpdate();
+			ps1.close();
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
