@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -119,6 +120,36 @@ public class PersonDao implements IPersonDao {
 
 		return person;
 	}
+	
+	@Override
+	public Person findPersonByEmail(String email) throws PersonDoesNotExistException {
+		Person person = new Person();
+		
+		try (Connection connection = createConnection()) {
+			Statement statement = connection.createStatement();
+			ResultSet resultSet;
+			resultSet = statement.executeQuery("select * from PERSONS where Email =" + email + ";");
+
+			if (resultSet.next()) {
+				person.setPersonId(resultSet.getLong("PersonId"));
+				person.setFirstName(resultSet.getString("FirstName"));
+				person.setLastName(resultSet.getString("LastName"));
+				person.setEmail(resultSet.getString("Email"));
+				person.setWebSite(resultSet.getString("WebSite"));
+				person.setBirthDate(resultSet.getDate("BirthDate"));
+				person.setPassword(resultSet.getString("Password"));
+				person.setGroupId(resultSet.getLong("GroupId"));
+			} else {
+				throw new PersonDoesNotExistException("There is no person of email =" + email + " in base !");
+			}
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return person;
+	}
 
 	@Override
 	public Group findGroup(long id) throws GroupDoesNotExistException {
@@ -145,18 +176,17 @@ public class PersonDao implements IPersonDao {
 	@Override
 	public void savePerson(Person person) throws InvalidPersonException {
 		try (Connection connection = createConnection()) {
-			
+
 			if (person.getPersonId() <= 0) {
 				throw new InvalidPersonException("Id of a person must be strictly positive.");
-			}
-			else if (personExists(person.getPersonId())) {
+			} else if (personExists(person.getPersonId())) {
 				try {
 					deletePerson(person.getPersonId());
 				} catch (PersonDoesNotExistException e) {
 					e.printStackTrace();
 				}
 			}
-			
+
 			String sql;
 			sql = "INSERT INTO PERSONS(PersonId,FirstName,LastName,Email,WebSite,BirthDate,Password,GroupId)"
 					+ " VALUES(?,?,?,?,?,?,?,?)";
@@ -185,11 +215,10 @@ public class PersonDao implements IPersonDao {
 		try (Connection connection = createConnection()) {
 			if (group.getGroupId() <= 0) {
 				throw new InvalidGroupException("Id of a group must be strictly positive.");
-			}
-			else if (groupExists(group.getGroupId())) {
+			} else if (groupExists(group.getGroupId())) {
 				deleteGroup(group.getGroupId());
 			}
-			
+
 			String sql;
 			sql = "INSERT INTO GROUPS(GroupId, Name) VALUES(?,?)";
 
@@ -226,9 +255,9 @@ public class PersonDao implements IPersonDao {
 			}
 		} catch (SQLException se) {
 			se.printStackTrace();
-		} catch (Exception e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		}
+		} 
 	}
 
 	/**
@@ -253,9 +282,9 @@ public class PersonDao implements IPersonDao {
 			}
 		} catch (SQLException se) {
 			se.printStackTrace();
-		} catch (Exception e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		}
+		} 
 	}
 
 	@Override
@@ -270,10 +299,9 @@ public class PersonDao implements IPersonDao {
 			ret = resultSet.next();
 		} catch (SQLException se) {
 			se.printStackTrace();
-		} catch (Exception e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		}
-
+		} 
 		return ret;
 	}
 
@@ -289,10 +317,9 @@ public class PersonDao implements IPersonDao {
 			ret = resultSet.next();
 		} catch (SQLException se) {
 			se.printStackTrace();
-		} catch (Exception e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		}
-
+		} 
 		return ret;
 	}
 
@@ -312,10 +339,13 @@ public class PersonDao implements IPersonDao {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
-	 * Deletes a group WITHOUT checking if a foreign key  is referencing it => may cause inconsistencies 
-	 * @param id the group to be deleted
+	 * Deletes a group WITHOUT checking if a foreign key is referencing it =>
+	 * may cause inconsistencies
+	 * 
+	 * @param id
+	 *            the group to be deleted
 	 */
 	private void deleteGroup(long id) {
 		try (Connection connection = createConnection()) {
@@ -331,21 +361,26 @@ public class PersonDao implements IPersonDao {
 			}
 		} catch (SQLException se) {
 			se.printStackTrace();
-		} catch (Exception e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	@Override
-	public void modifyPerson(Person p) throws PersonDoesNotExistException{
-		try (Connection conn = createConnection()) {
-			
-			SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy"); 
 
-			//Vérifier si la personne existe avant de l'update
-			
+	@Override
+	public void modifyPerson(Person p) throws PersonDoesNotExistException {
+		if (!personExists(p.getPersonId())) {
+			throw new PersonDoesNotExistException("Trying to modify a person that is not present in base.");
+		}
+		
+		try (Connection conn = createConnection()) {
+
+			SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy");
+
 			String sql;
-			sql = "UPDATE PERSON SET firstName ='"+p.getFirstName()+"' and lastName ='"+p.getFirstName()+"' and mail ='"+p.getMail()+"' and webSite ='"+p.getWebSite()+"' and  birthDate=TO_DATE('"+dt.format(p.getBirthDate())+"', 'DD/MM/YYYY') and password ='"+p.getPassword()+"' where idPerson="+p.getIdPerson();
+			sql = "UPDATE PERSON SET firstName ='" + p.getFirstName() + "' and lastName ='" + p.getFirstName()
+					+ "' and mail ='" + p.getEmail() + "' and webSite ='" + p.getWebSite() + "' and  birthDate=TO_DATE('"
+					+ dt.format(p.getBirthDate()) + "', 'DD/MM/YYYY') and password ='" + p.getPassword()
+					+ "' where idPerson=" + p.getPersonId();
 
 			PreparedStatement ps1 = conn.prepareStatement(sql);
 
@@ -354,8 +389,8 @@ public class PersonDao implements IPersonDao {
 
 		} catch (SQLException se) {
 			se.printStackTrace();
-		} catch (Exception e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		}
+		} 
 	}
 }

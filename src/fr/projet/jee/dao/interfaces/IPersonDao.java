@@ -28,36 +28,52 @@ public interface IPersonDao {
 
 	/**
 	 * Finds a given group
-	 * @param id the id of the group to be found
+	 * 
+	 * @param id
+	 *            the id of the group to be found
 	 * @return the group
-	 * @throws GroupDoesNotExistException if no group with such id exists
+	 * @throws GroupDoesNotExistException
+	 *             if no group with such id exists
 	 */
 	Group findGroup(long id) throws GroupDoesNotExistException;
 
 	/**
-	 * récupérer une personne donnée
+	 * Finds a given person based on his id
 	 * 
 	 * @param id
-	 *            l'id de la personne
-	 * @return la personne en question
+	 *            the person's id
+	 * @return the searched person
 	 * @throws PersonDoesNotExistException
 	 *             thrown when a person with a PersonId=id doesn't exist
 	 */
 	Person findPerson(long id) throws PersonDoesNotExistException;
 
 	/**
+	 * Finds a given person based on his email address
+	 * 
+	 * @param email
+	 *            the person's email address
+	 * @return the searched person
+	 * @throws PersonDoesNotExistException
+	 *             thrown when a person with a Email=email doesn't exist
+	 */
+	Person findPersonByEmail(String email) throws PersonDoesNotExistException;
+
+	/**
 	 * Saves or, if already present, modifies a person
 	 * 
-	 * @param p the person to be modified or saved in base
-	 * @throws InvalidPersonException 
+	 * @param p
+	 *            the person to be modified or saved in base
+	 * @throws InvalidPersonException
 	 */
 	void savePerson(Person p) throws InvalidPersonException;
 
 	/**
-	 * Saves a group in table GROUPS 
+	 * Saves a group in table GROUPS
 	 * 
-	 * @param g the group to be saved in base
-	 * @throws InvalidGroupException 
+	 * @param g
+	 *            the group to be saved in base
+	 * @throws InvalidGroupException
 	 */
 	void saveGroup(Group g) throws InvalidGroupException;
 
@@ -99,15 +115,15 @@ public interface IPersonDao {
 	 *             if trying to delete a person that is not present in base
 	 */
 	void deletePerson(long id) throws PersonDoesNotExistException;
-	
+
 	/**
 	 * Modifies a person already present in base
 	 *
-	 * @param p the person to be modified
+	 * @param p
+	 *            the person to be modified
 	 *
 	 * @throws PersonDoesNotExistException
 	 *             if trying to modify a person that is not present in base
 	 */
-	 
 	void modifyPerson(Person p) throws PersonDoesNotExistException;
 }
