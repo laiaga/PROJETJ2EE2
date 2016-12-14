@@ -9,9 +9,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import fr.projet.jee.beans.Group;
 import fr.projet.jee.beans.Person;
@@ -21,8 +21,8 @@ import fr.projet.jee.exceptions.InvalidGroupException;
 import fr.projet.jee.exceptions.InvalidPersonException;
 import fr.projet.jee.exceptions.PersonDoesNotExistException;
 
-@Service
-public class PersonDao implements IPersonDao {
+@Repository
+class PersonDao implements IPersonDao {
 	private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 	private static final String DB_URL = "jdbc:mysql://localhost:3306/annuaire?useSSL=false";
 
@@ -36,8 +36,8 @@ public class PersonDao implements IPersonDao {
 	}
 
 	@Override
-	public Collection<Group> findAllGroups() {
-		Collection<Group> listGroups = new ArrayList<>();
+	public List<Group> findAllGroups() {
+		List<Group> listGroups = new ArrayList<>();
 
 		try (Connection connection = createConnection()) {
 			Statement statement = connection.createStatement();
@@ -48,8 +48,8 @@ public class PersonDao implements IPersonDao {
 				Group group = new Group();
 				group.setGroupId(resultSet.getLong("GroupId"));
 				group.setName(resultSet.getString("Name"));
+				group.setPersonsList(findAllPersons(group.getGroupId()));
 				listGroups.add(group);
-				// TODO : gestion des personnes qui font partie du groupe
 			}
 
 		} catch (SQLException se) {
@@ -61,8 +61,8 @@ public class PersonDao implements IPersonDao {
 	}
 
 	@Override
-	public Collection<Person> findAllPersons(long groupId) {
-		Collection<Person> listPersons = new ArrayList<>();
+	public List<Person> findAllPersons(long groupId) {
+		List<Person> listPersons = new ArrayList<>();
 
 		try (Connection connection = createConnection()) {
 			Statement statement = connection.createStatement();
@@ -161,7 +161,7 @@ public class PersonDao implements IPersonDao {
 			if (resultSet.next()) {
 				group.setName(resultSet.getString("Name"));
 				group.setGroupId(resultSet.getInt("GroupId"));
-				// TODO : gestion des personnes qui font partie du groupe
+				group.setPersonsList(findAllPersons(group.getGroupId()));
 			} else {
 				throw new GroupDoesNotExistException("There is no group of id=" + id + " in base !");
 			}
@@ -202,6 +202,7 @@ public class PersonDao implements IPersonDao {
 			preparedStatement.setLong(8, person.getGroupId());
 			preparedStatement.executeUpdate();
 			preparedStatement.close();
+			//TODO : certains des arguments ne sont pas obligatoires 
 		} catch (SQLException se) {
 			se.printStackTrace();
 		} catch (ClassNotFoundException e) {

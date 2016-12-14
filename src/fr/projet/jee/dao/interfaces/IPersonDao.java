@@ -1,6 +1,6 @@
 package fr.projet.jee.dao.interfaces;
 
-import java.util.Collection;
+import java.util.List;
 
 import fr.projet.jee.beans.Group;
 import fr.projet.jee.beans.Person;
@@ -11,20 +11,20 @@ import fr.projet.jee.exceptions.PersonDoesNotExistException;
 
 public interface IPersonDao {
 	/**
-	 * récupérer les groupes
+	 * Finds all groups in base
 	 * 
-	 * @return l'ensemble des groupes existant
+	 * @return a list of all groups in base
 	 */
-	Collection<Group> findAllGroups();
+	List<Group> findAllGroups();
 
 	/**
-	 * récupérer les personnes appartenant à un groupe
+	 * Finds all persons that are part of a given group
 	 * 
 	 * @param groupId
-	 *            le groupe dont on souaite trouver les membres
-	 * @return les personnes appartenant à ce groupe
+	 *            the group of which we want the members
+	 * @return a list the members of this group
 	 */
-	Collection<Person> findAllPersons(long groupId);
+	List<Person> findAllPersons(long groupId);
 
 	/**
 	 * Finds a given group
