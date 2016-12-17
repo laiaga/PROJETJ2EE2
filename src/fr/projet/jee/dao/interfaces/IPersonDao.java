@@ -64,7 +64,7 @@ public interface IPersonDao {
 	 * 
 	 * @param p
 	 *            the person to be modified or saved in base
-	 * @throws InvalidPersonException
+	 * @throws InvalidPersonException if the person does not fill required fields, or with unauthorized values
 	 */
 	void savePerson(Person p) throws InvalidPersonException;
 
@@ -115,15 +115,4 @@ public interface IPersonDao {
 	 *             if trying to delete a person that is not present in base
 	 */
 	void deletePerson(long id) throws PersonDoesNotExistException;
-
-	/**
-	 * Modifies a person already present in base
-	 *
-	 * @param p
-	 *            the person to be modified
-	 *
-	 * @throws PersonDoesNotExistException
-	 *             if trying to modify a person that is not present in base
-	 */
-	void modifyPerson(Person p) throws PersonDoesNotExistException;
 }

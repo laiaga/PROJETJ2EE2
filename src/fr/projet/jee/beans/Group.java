@@ -1,5 +1,6 @@
 package fr.projet.jee.beans;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -13,12 +14,16 @@ public class Group {
 
 	@PostConstruct
 	public void init() {
-
+		
 	}
 
 	@PreDestroy
 	public void close() {
 
+	}
+	
+	public Group() {
+		personsList = new ArrayList<>();
 	}
 
 	public String getName() {

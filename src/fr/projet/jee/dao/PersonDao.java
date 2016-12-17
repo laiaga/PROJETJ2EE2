@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ import fr.projet.jee.exceptions.InvalidPersonException;
 import fr.projet.jee.exceptions.PersonDoesNotExistException;
 
 @Repository
-class PersonDao implements IPersonDao {
+public class PersonDao implements IPersonDao {
 	private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 	private static final String DB_URL = "jdbc:mysql://localhost:3306/annuaire?useSSL=false";
 
@@ -43,18 +42,19 @@ class PersonDao implements IPersonDao {
 			Statement statement = connection.createStatement();
 			ResultSet resultSet;
 			resultSet = statement.executeQuery("select * from GROUPS");
-
+			List<Person> personsList;
 			while (resultSet.next()) {
 				Group group = new Group();
 				group.setGroupId(resultSet.getLong("GroupId"));
 				group.setName(resultSet.getString("Name"));
-				group.setPersonsList(findAllPersons(group.getGroupId()));
+				personsList = findAllPersons(group.getGroupId());
+				group.setPersonsList(personsList.isEmpty() ? null : personsList);
 				listGroups.add(group);
 			}
 
 		} catch (SQLException se) {
 			se.printStackTrace();
-		} catch (Exception e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		return listGroups;
@@ -84,7 +84,7 @@ class PersonDao implements IPersonDao {
 
 		} catch (SQLException se) {
 			se.printStackTrace();
-		} catch (Exception e) {
+		} catch (ClassNotFoundException	 e) {
 			e.printStackTrace();
 		}
 
@@ -120,15 +120,15 @@ class PersonDao implements IPersonDao {
 
 		return person;
 	}
-	
+
 	@Override
 	public Person findPersonByEmail(String email) throws PersonDoesNotExistException {
 		Person person = new Person();
-		
+
 		try (Connection connection = createConnection()) {
 			Statement statement = connection.createStatement();
 			ResultSet resultSet;
-			resultSet = statement.executeQuery("select * from PERSONS where Email =" + email + ";");
+			resultSet = statement.executeQuery("select * from PERSONS where Email = '" + email + "';");
 
 			if (resultSet.next()) {
 				person.setPersonId(resultSet.getLong("PersonId"));
@@ -140,7 +140,7 @@ class PersonDao implements IPersonDao {
 				person.setPassword(resultSet.getString("Password"));
 				person.setGroupId(resultSet.getLong("GroupId"));
 			} else {
-				throw new PersonDoesNotExistException("There is no person of email =" + email + " in base !");
+				throw new PersonDoesNotExistException("There is no person of email=" + email + " in base !");
 			}
 		} catch (SQLException se) {
 			se.printStackTrace();
@@ -157,11 +157,13 @@ class PersonDao implements IPersonDao {
 		try (Connection connection = createConnection()) {
 			Statement statement = connection.createStatement();
 			ResultSet resultSet;
+			List<Person> personsList;
 			resultSet = statement.executeQuery("select * from GROUPS where GroupId=" + id + ";");
 			if (resultSet.next()) {
 				group.setName(resultSet.getString("Name"));
 				group.setGroupId(resultSet.getInt("GroupId"));
-				group.setPersonsList(findAllPersons(group.getGroupId()));
+				personsList = findAllPersons(group.getGroupId());
+				group.setPersonsList(personsList.isEmpty() ? null : personsList);
 			} else {
 				throw new GroupDoesNotExistException("There is no group of id=" + id + " in base !");
 			}
@@ -197,12 +199,11 @@ class PersonDao implements IPersonDao {
 			preparedStatement.setString(3, person.getLastName());
 			preparedStatement.setString(4, person.getEmail());
 			preparedStatement.setString(5, person.getWebSite());
-			preparedStatement.setDate(6, new java.sql.Date(person.getBirthDate().getTime()));
+			preparedStatement.setDate(6, person.getBirthDate());
 			preparedStatement.setString(7, person.getPassword());
 			preparedStatement.setLong(8, person.getGroupId());
 			preparedStatement.executeUpdate();
 			preparedStatement.close();
-			//TODO : certains des arguments ne sont pas obligatoires 
 		} catch (SQLException se) {
 			se.printStackTrace();
 		} catch (ClassNotFoundException e) {
@@ -245,20 +246,14 @@ class PersonDao implements IPersonDao {
 	@Override
 	public void clearPersons() {
 		try (Connection connection = createConnection()) {
-			String sql;
 			Statement statement = connection.createStatement();
-			DatabaseMetaData metaData = connection.getMetaData();
-			ResultSet resultSet = metaData.getTables(null, null, "PERSONS", new String[] { "TABLE" });
-
-			if (resultSet.next()) {
-				sql = "TRUNCATE TABLE PERSONS;";
-				statement.executeUpdate(sql);
-			}
+			String sql = "TRUNCATE TABLE PERSONS;";
+			statement.executeUpdate(sql);
 		} catch (SQLException se) {
 			se.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
 
 	/**
@@ -285,7 +280,7 @@ class PersonDao implements IPersonDao {
 			se.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
 
 	@Override
@@ -302,7 +297,7 @@ class PersonDao implements IPersonDao {
 			se.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		} 
+		}
 		return ret;
 	}
 
@@ -320,7 +315,7 @@ class PersonDao implements IPersonDao {
 			se.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		} 
+		}
 		return ret;
 	}
 
@@ -365,33 +360,5 @@ class PersonDao implements IPersonDao {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void modifyPerson(Person p) throws PersonDoesNotExistException {
-		if (!personExists(p.getPersonId())) {
-			throw new PersonDoesNotExistException("Trying to modify a person that is not present in base.");
-		}
-		
-		try (Connection conn = createConnection()) {
-
-			SimpleDateFormat dt = new SimpleDateFormat("dd/mm/yyyy");
-
-			String sql;
-			sql = "UPDATE PERSON SET firstName ='" + p.getFirstName() + "' and lastName ='" + p.getFirstName()
-					+ "' and mail ='" + p.getEmail() + "' and webSite ='" + p.getWebSite() + "' and  birthDate=TO_DATE('"
-					+ dt.format(p.getBirthDate()) + "', 'DD/MM/YYYY') and password ='" + p.getPassword()
-					+ "' where idPerson=" + p.getPersonId();
-
-			PreparedStatement ps1 = conn.prepareStatement(sql);
-
-			ps1.executeUpdate();
-			ps1.close();
-
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} 
 	}
 }

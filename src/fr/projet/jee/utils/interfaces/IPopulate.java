@@ -8,5 +8,5 @@ public interface IPopulate {
 	void createGroups(int nbGroups) throws InvalidGroupException;
 	void createPersons(int nbGroups) throws InvalidPersonException;
 	void createPersons(int nbGroups, int nbPersons) throws InvalidPersonException;
-	void createAll() throws InvalidPersonException, InvalidGroupException;
+	void createAll();
 }

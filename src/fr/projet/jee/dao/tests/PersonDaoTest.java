@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +37,6 @@ public class PersonDaoTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	@SuppressWarnings("deprecation")
 	@Before
 	public void setUp() throws Exception {
 		dao.clearTables();
@@ -52,24 +50,16 @@ public class PersonDaoTest {
 		g2.setName("groupe test 2");
 
 		p1 = new Person();
-		p1.setBirthDate(new Date(1991, 7, 21));
 		p1.setEmail("un@test.com");
-		p1.setFirstName("john");
 		p1.setPersonId(1);
 		p1.setGroupId(1);
-		p1.setLastName("doe");
 		p1.setPassword("pwd");
-		p1.setWebSite("site.un.com");
 
 		p2 = new Person();
-		p2.setBirthDate(new Date(1952, 1, 17));
 		p2.setEmail("deux@test.com");
-		p2.setFirstName("will");
 		p2.setPersonId(2);
 		p2.setGroupId(1);
-		p2.setLastName("smith");
 		p2.setPassword("pwd");
-		p2.setWebSite("site.deux.com");
 	}
 
 	@After
@@ -89,7 +79,16 @@ public class PersonDaoTest {
 		expected.add(g1);
 		expected.add(g2);
 		assertEquals(expected, dao.findAllGroups());
+		
+		try {
+			dao.savePerson(p1);
+		} catch (InvalidPersonException e) {
+			e.printStackTrace();
+		}
 
+		g1.getPersonsList().add(p1);
+		assertEquals(expected, dao.findAllGroups());
+		
 		dao.clearTables();
 		assertEquals(new ArrayList<Group>(), dao.findAllGroups());
 	}
@@ -146,8 +145,13 @@ public class PersonDaoTest {
 			Group tmp = dao.findGroup(g1.getGroupId());
 			assertEquals(g1.getGroupId(), tmp.getGroupId());
 			assertEquals(g1.getName(), tmp.getName());
-			assertEquals(g1.getPersonsList(), tmp.getPersonsList());
-		} catch (InvalidGroupException | GroupDoesNotExistException e) {
+			assertEquals(null, tmp.getPersonsList());
+			dao.savePerson(p1);
+			List<Person> expected = new ArrayList<>();
+			expected.add(p1);
+			tmp = dao.findGroup(g1.getGroupId());
+			assertEquals(expected, tmp.getPersonsList());
+		} catch (InvalidGroupException | GroupDoesNotExistException | InvalidPersonException e) {
 			e.printStackTrace();
 		}	
 	}
@@ -230,6 +234,7 @@ public class PersonDaoTest {
 		assertTrue(dao.personExists(p1.getPersonId()));
 		dao.clearPersons();
 		assertFalse(dao.personExists(p1.getPersonId()));
+		dao.clearPersons();
 	}
 
 	@Test
@@ -283,9 +288,21 @@ public class PersonDaoTest {
 	
 	@Test
 	public void testDeletePersonPersonDoesNotExistException() throws PersonDoesNotExistException {
-		//A compléter avec plus de cas par la suite
+		//TODO :A compléter avec plus de cas par la suite
 		thrown.expect(PersonDoesNotExistException.class);
 		dao.deletePerson(p1.getPersonId());
 	}
-
+	
+	@Test
+	public void testFindPersonByEmail() throws PersonDoesNotExistException {
+		try {
+			dao.saveGroup(g1);
+			dao.savePerson(p1);
+			assertEquals(p1, dao.findPersonByEmail(p1.getEmail()));
+		} catch (InvalidGroupException | InvalidPersonException e) {
+			e.printStackTrace();
+		}
+		thrown.expect(PersonDoesNotExistException.class);
+		dao.findPersonByEmail(p2.getEmail());
+	}
 }

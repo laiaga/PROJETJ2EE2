@@ -68,7 +68,7 @@ public class Populate implements IPopulate {
 				person.setLastName(name);
 				person.setGroupId(personId % nbGroups + 1);
 				person.setEmail(surname + "." + name + "@etu.univ-amu.fr");
-				person.setBirthDate(new Date(1998,12,28));
+				person.setBirthDate(Date.valueOf("1990-12-28"));
 				person.setPassword(Integer.toString(random.nextInt()));
 				person.setWebSite("website.fr");
 				dao.savePerson(person);
@@ -90,7 +90,7 @@ public class Populate implements IPopulate {
 			person.setLastName(names[random.nextInt(names.length)]);
 			person.setGroupId((i+1) % nbGroups + 1);
 			person.setEmail(person.getFirstName() + "." + person.getLastName() + "@etu.univ-amu.fr");
-			person.setBirthDate(new Date(1998,12,28));
+			person.setBirthDate(Date.valueOf("1990-12-28"));
 			person.setPassword(Integer.toString(random.nextInt()));
 			person.setWebSite("website.fr");
 			dao.savePerson(person);
@@ -99,8 +99,15 @@ public class Populate implements IPopulate {
 	}
 	
 	@Override
-	public void createAll() throws InvalidPersonException, InvalidGroupException {
-		createGroups();
-		createPersons(groups.length);
+	public void createAll() {
+		try {
+			createGroups();
+			createPersons(groups.length);
+		} catch (InvalidGroupException e) {
+			e.printStackTrace();
+		} catch (InvalidPersonException e) {
+			e.printStackTrace();
+		}
+		
 	}
 }

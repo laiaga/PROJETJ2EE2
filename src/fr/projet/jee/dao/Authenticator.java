@@ -9,7 +9,7 @@ import fr.projet.jee.dao.interfaces.IPersonDao;
 import fr.projet.jee.exceptions.PersonDoesNotExistException;
 
 @Service
-class Authenticator implements IAuthenticator{
+class Authenticator implements IAuthenticator {
 	@Autowired
 	private IPersonDao dao;
 
@@ -18,14 +18,10 @@ class Authenticator implements IAuthenticator{
 			throws IllegalArgumentException, PersonDoesNotExistException {
 		Person person = dao.findPersonByEmail(email);
 
-		if (person != null) {
-			if (person.getPassword().equals(password)) {
-				return person.getPersonId();
-			} else {
-				throw new IllegalArgumentException("Invalid password.");
-			}
+		if (person.getPassword().equals(password)) {
+			return person.getPersonId();
 		} else {
-			return -1;
+			throw new IllegalArgumentException("Invalid password.");
 		}
 	}
 }
