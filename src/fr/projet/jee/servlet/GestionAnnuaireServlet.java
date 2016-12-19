@@ -1,4 +1,4 @@
-package servlet;
+package fr.projet.jee.servlet;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -45,7 +45,6 @@ public class GestionAnnuaireServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String action = request.getParameter("ACTION");
-
 
 		if (action.equals(GestionAnnuaireServlet.FIND_ALL_GROUPS)) {
 			Collection<Group> groups = GestionAnnuaireServlet.findAllGroups();
@@ -155,7 +154,7 @@ public class GestionAnnuaireServlet extends HttpServlet {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
-	}	
+	}
 
 	public static Collection<Group> findAllGroups() {
 		IPersonDao person = new PersonDao();

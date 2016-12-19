@@ -60,6 +60,9 @@ public class Populate implements IPopulate {
 	@Override
 	public void createPersons(int nbGroups) throws InvalidPersonException {
 		int personId = 1;
+		if (nbGroups > groups.length) {
+			throw new IllegalArgumentException();
+		} 
 		for (String surname : surnames) {
 			for (String name : names) {
 				Person person = new Person();
