@@ -39,8 +39,6 @@ public class PersonDaoTest {
 
 	@Before
 	public void setUp() throws Exception {
-		dao.clearTables();
-
 		g1 = new Group();
 		g1.setGroupId(1);
 		g1.setName("groupe test");
@@ -64,6 +62,7 @@ public class PersonDaoTest {
 
 	@After
 	public void tearDown() throws Exception {
+		dao.clearTables();
 	}
 
 	@Test

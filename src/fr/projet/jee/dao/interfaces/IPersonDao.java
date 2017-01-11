@@ -9,6 +9,13 @@ import fr.projet.jee.exceptions.InvalidGroupException;
 import fr.projet.jee.exceptions.InvalidPersonException;
 import fr.projet.jee.exceptions.PersonDoesNotExistException;
 
+/**
+ * 
+ * @author Alexandre Leonardi
+ * 
+ *         Manages accesses to the database
+ *
+ */
 public interface IPersonDao {
 	/**
 	 * Finds all groups in base
@@ -64,7 +71,9 @@ public interface IPersonDao {
 	 * 
 	 * @param p
 	 *            the person to be modified or saved in base
-	 * @throws InvalidPersonException if the person does not fill required fields, or with unauthorized values
+	 * @throws InvalidPersonException
+	 *             if the person does not fill required fields, or with
+	 *             unauthorized values
 	 */
 	void savePerson(Person p) throws InvalidPersonException;
 

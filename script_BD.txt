@@ -4,24 +4,29 @@ CREATE DATABASE annuaire;
 
 use annuaire;
 
-CREATE TABLE Groups
-(
-	GroupId INT NOT NULL,
-	Name VARCHAR(255) NOT NULL,
-	PRIMARY KEY (GroupId)
+CREATE TABLE `group` (
+	`idGroup` BIGINT NOT NULL AUTO_INCREMENT,
+	`Nomgroup` VARCHAR(60) NULL DEFAULT NULL,
+	PRIMARY KEY (idGroup)
 );
 
-CREATE TABLE Persons
-(
-   PersonId INT NOT NULL AUTO_INCREMENT,
-   FirstName VARCHAR(20) DEFAULT NULL,
-   LastName VARCHAR(20) DEFAULT NULL ,
-   Email VARCHAR(50) NOT NULL ,
-   Website VARCHAR(20) DEFAULT NULL ,
-   BirthDate Date DEFAULT NULL ,
-   Password VARCHAR(20) NOT NULL ,
-   GroupId INT NOT NULL,
-   PRIMARY KEY (PersonId),
-   CONSTRAINT FK_person_group FOREIGN KEY(`GroupId`)
-   REFERENCES `Groups` (`GroupId`) ON UPDATE NO ACTION ON DELETE NO ACTION	
+CREATE TABLE `person`(
+   `idPerson` INT(11) NOT NULL AUTO_INCREMENT,
+   `firstName` VARCHAR(20) NULL DEFAULT NULL,
+   `lastName` VARCHAR(20) NULL DEFAULT NULL ,
+   `mail` VARCHAR(50) NULL DEFAULT NULL ,
+   `website` VARCHAR(20) NULL DEFAULT NULL ,
+   `birthDate` Date NULL DEFAULT NULL ,
+   `password` VARCHAR(20) NULL DEFAULT NULL ,
+   `idGroup` BIGINT(16),
+   PRIMARY KEY (idPerson),
+   CONSTRAINT FK_person_group FOREIGN KEY(`idGroup`)
+   REFERENCES `group` (`idGroup`) ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+SELECT * FROM annuaire.group;
+INSERT INTO `annuaire`.`group` ( `Nomgroup`) VALUES ('ID');
+INSERT INTO `annuaire`.`group` (`Nomgroup`) VALUES ( 'FSI');
+INSERT INTO `annuaire`.`group` (`Nomgroup`) VALUES ('ISL');
+INSERT INTO `annuaire`.`group` (`Nomgroup`) VALUES ( 'GL');
+INSERT INTO `annuaire`.`group` (`Nomgroup`) VALUES ('SIR');
+

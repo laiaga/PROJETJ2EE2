@@ -12,7 +12,9 @@
 <a href="/PROJETJ2EE2/GestionAnnuaireServlet?ACTION=FIND_ALL_PERSONS">Find All Persons</a>
 <a href="/PROJETJ2EE2/GestionAnnuaireServlet?ACTION=FIND_PERSON">Find Person</a>
 
-<a href="/PROJETJ2EE2/GestionAnnuaireServlet?ACTION=CONNECTION">Connection</a>
+<a href="/PROJETJ2EE2/GestionAnnuaireServlet?ACTION=CONNECTION&message=">Connection</a>
+<a href="/PROJETJ2EE2/GestionAnnuaireServlet?ACTION=OFFLINE">Offline</a>
+
 <br><br><br>
 
 <form action="/PROJETJ2EE2/GestionAnnuaireServlet?ACTION=DISPLAY_PERSON" method="GET">

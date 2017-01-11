@@ -4,17 +4,22 @@ import java.io.IOException;
 import java.util.Collection;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+
 import fr.projet.jee.beans.Group;
 import fr.projet.jee.beans.Person;
 import fr.projet.jee.dao.PersonDao;
 import fr.projet.jee.dao.interfaces.IPersonDao;
 import fr.projet.jee.exceptions.PersonDoesNotExistException;
+import fr.projet.jee.utils.interfaces.IPopulate;
 
 /**
  * Servlet implementation class GestionAnnuaireServlet
@@ -29,12 +34,15 @@ public class GestionAnnuaireServlet extends HttpServlet {
 	public final static String DISPLAY_PERSON = "DISPLAY_PERSON";
 	public final static String CONNECTION = "CONNECTION";
 
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+	}
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public GestionAnnuaireServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -45,7 +53,6 @@ public class GestionAnnuaireServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String action = request.getParameter("ACTION");
-
 		if (action.equals(GestionAnnuaireServlet.FIND_ALL_GROUPS)) {
 			Collection<Group> groups = GestionAnnuaireServlet.findAllGroups();
 			request.setAttribute("groups", groups.toArray(new Group[groups.size()]));
@@ -152,7 +159,6 @@ public class GestionAnnuaireServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 
@@ -172,8 +178,7 @@ public class GestionAnnuaireServlet extends HttpServlet {
 		try {
 			return person.findPersonByEmail(email);
 		} catch (PersonDoesNotExistException e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -184,7 +189,6 @@ public class GestionAnnuaireServlet extends HttpServlet {
 		try {
 			return person.findPerson(id);
 		} catch (PersonDoesNotExistException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

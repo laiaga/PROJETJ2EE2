@@ -11,7 +11,10 @@
 <a href="/PROJETJ2EE2/GestionAnnuaireServlet?ACTION=FIND_ALL_PERSONS">Find All Persons</a>
 <a href="/PROJETJ2EE2/GestionAnnuaireServlet?ACTION=FIND_PERSON">Find Person</a>
 
-<a href="/PROJETJ2EE2/GestionAnnuaireServlet?ACTION=CONNECTION">Connection</a>
+<a href="/PROJETJ2EE2/GestionAnnuaireServlet?ACTION=CONNECTION&message=">Connection</a>
+<a href="/PROJETJ2EE2/GestionAnnuaireServlet?ACTION=OFFLINE">Offline</a>
+<a href="/PROJETJ2EE2/GestionAnnuaireServlet?ACTION=Password_Recovery">Password Recovery</a>
+
 
 <br><br><br>
 
@@ -21,9 +24,9 @@
 	<input type=text id="mail" name="mail" value="${mail}" required/>
 	<br><br>
 	<label for="password">Password : </label>
-	<input type=text id="password" name="password" value="${password}" required/>
+	<input type="password" id="password" name="password" value="${password}" required/>
 	<br><br>
-	<label id='message' name='message' for="message" value="${message}"/>
+	<input disabled="disabled" style="width: 400px; padding: 2px;color:red"  id='message' name='message' for="message" value="${message}"/>
 	<br><br>
 	<input value="Connect" type="submit" />
 </form>

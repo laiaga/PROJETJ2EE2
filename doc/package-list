@@ -1,0 +1,9 @@
+fr.projet.jee.beans
+fr.projet.jee.dao
+fr.projet.jee.dao.interfaces
+fr.projet.jee.dao.tests
+fr.projet.jee.exceptions
+fr.projet.jee.servlet
+fr.projet.jee.utils
+fr.projet.jee.utils.interfaces
+fr.projet.jee.utils.tests

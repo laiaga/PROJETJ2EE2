@@ -28,6 +28,9 @@ public class Populate implements IPopulate {
 	@Value("${groups}")
 	private String[] groups;
 	
+	@Value("${default_pwd}")
+	private String defaultPassword;
+	
 	private Random random = new Random();
 	
 	@Override
@@ -72,7 +75,7 @@ public class Populate implements IPopulate {
 				person.setGroupId(personId % nbGroups + 1);
 				person.setEmail(surname + "." + name + "@etu.univ-amu.fr");
 				person.setBirthDate(Date.valueOf("1990-12-28"));
-				person.setPassword(Integer.toString(random.nextInt()));
+				person.setPassword(defaultPassword);
 				person.setWebSite("website.fr");
 				dao.savePerson(person);
 				personId++;
@@ -94,7 +97,7 @@ public class Populate implements IPopulate {
 			person.setGroupId((i+1) % nbGroups + 1);
 			person.setEmail(person.getFirstName() + "." + person.getLastName() + "@etu.univ-amu.fr");
 			person.setBirthDate(Date.valueOf("1990-12-28"));
-			person.setPassword(Integer.toString(random.nextInt()));
+			person.setPassword(defaultPassword);
 			person.setWebSite("website.fr");
 			dao.savePerson(person);
 		}
@@ -111,6 +114,5 @@ public class Populate implements IPopulate {
 		} catch (InvalidPersonException e) {
 			e.printStackTrace();
 		}
-		
 	}
 }

@@ -1,0 +1,27 @@
+DROP DATABASE annuaire;
+
+CREATE DATABASE annuaire;
+
+use annuaire;
+
+CREATE TABLE Groups
+(
+	GroupId INT NOT NULL,
+	Name VARCHAR(255) NOT NULL,
+	PRIMARY KEY (GroupId)
+);
+
+CREATE TABLE Persons
+(
+   PersonId INT NOT NULL AUTO_INCREMENT,
+   FirstName VARCHAR(20) DEFAULT NULL,
+   LastName VARCHAR(20) DEFAULT NULL ,
+   Email VARCHAR(50) NOT NULL ,
+   Website VARCHAR(20) DEFAULT NULL ,
+   BirthDate Date DEFAULT NULL ,
+   Password VARCHAR(20) NOT NULL ,
+   GroupId INT NOT NULL,
+   PRIMARY KEY (PersonId),
+   CONSTRAINT FK_person_group FOREIGN KEY(`GroupId`)
+   REFERENCES `Groups` (`GroupId`) ON UPDATE NO ACTION ON DELETE NO ACTION	
+);

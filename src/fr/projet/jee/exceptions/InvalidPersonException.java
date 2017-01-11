@@ -1,7 +1,11 @@
 package fr.projet.jee.exceptions;
 
 /**
- * Exception thrown when the user tries to save an invalid person (e.g. id negative or null)
+ * 
+ * @author Alexandre Leonardi
+ * 
+ *         Exception thrown when the user tries to save an invalid person (e.g.
+ *         id negative or null)
  *
  */
 public class InvalidPersonException extends Exception {

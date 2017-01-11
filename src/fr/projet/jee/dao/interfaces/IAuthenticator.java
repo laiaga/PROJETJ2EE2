@@ -2,6 +2,14 @@ package fr.projet.jee.dao.interfaces;
 
 import fr.projet.jee.exceptions.PersonDoesNotExistException;
 
+/**
+ * 
+ * @author Alexandre Leonardi
+ * 
+ *         Used to authenticate an user, recognizing him as one of the saved
+ *         persons in the database
+ *
+ */
 public interface IAuthenticator {
 	/**
 	 * Searchs for a given person and then tries to connect this person

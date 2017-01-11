@@ -28,6 +28,12 @@ public class PersonDao implements IPersonDao {
 	private static final String USER = "root";
 	private static final String PASS = "root";
 
+	/**
+	 * Establishes a connection to the MySQL database
+	 * @return the said connection
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
 	private Connection createConnection() throws SQLException, ClassNotFoundException {
 		Class.forName(JDBC_DRIVER);
 		Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);

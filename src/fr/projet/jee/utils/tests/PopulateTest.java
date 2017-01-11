@@ -1,11 +1,13 @@
 package fr.projet.jee.utils.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,12 +48,17 @@ public class PopulateTest {
 	
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	@Before
 	public void setUp() throws Exception {
 		dao.clearTables();
 	}
-
+	
+	@After
+	public void tearDown() throws Exception {
+		dao.clearTables();
+	}
+	
 	@Test
 	public void testCreateGroups() {
 		try {
